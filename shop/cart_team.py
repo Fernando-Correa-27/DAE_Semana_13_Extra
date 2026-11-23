@@ -20,6 +20,12 @@ from shop.domain import (  # noqa: F401  (you will need most of these)
 )
 
 
+def _check_qty(qty):
+    """A quantity is a real integer >= 1; bool is an int subclass, so reject it explicitly."""
+    if isinstance(qty, bool) or not isinstance(qty, int) or qty < 1:
+        raise InvalidQuantity(f"Invalid quantity: {qty!r}")
+
+
 class Cart:
     def __init__(self, catalog):
         self._catalog = catalog  # sku -> Product (price Decimal, stock int)
@@ -41,19 +47,35 @@ class Cart:
     def add(self, sku, qty=1):
         """TODO: qty is an int >= 1 (InvalidQuantity); the sku exists (UnknownProduct);
         what is already in the cart plus qty must not exceed the stock (OutOfStock, cart unchanged)."""
-        raise NotImplementedError("TODO: add")
+        _check_qty(qty)
+        if sku not in self._catalog:
+            raise UnknownProduct(f"Unknown product: {sku!r}")
+        self._qty[sku] = self._qty.get(sku, 0) + qty
 
     def remove(self, sku, qty=None):
         """TODO: qty=None removes the whole line; otherwise subtract qty and drop the line when it
         reaches zero. A sku that is not in the cart is UnknownProduct. Never leave a negative quantity."""
-        raise NotImplementedError("TODO: remove")
+        if sku not in self._qty:
+            raise UnknownProduct(f"Product not in the cart: {sku!r}")
+        if qty is None:
+            del self._qty[sku]
+            return
+        _check_qty(qty)
+        remaining = self._qty[sku] - qty
+        if remaining <= 0:
+            del self._qty[sku]
+        else:
+            self._qty[sku] = remaining
 
     def qty_of(self, sku):
         return self._qty.get(sku, 0)
 
     def lines(self):
         """TODO: one Line(sku, name, unit_price, qty) per sku, in insertion order, price from the catalog."""
-        raise NotImplementedError("TODO: lines")
+        return [
+            Line(sku, self._catalog[sku].name, self._catalog[sku].price, qty)
+            for sku, qty in self._qty.items()
+        ]
 
     # --- coupon and totals ---
     def apply_coupon(self, code):
