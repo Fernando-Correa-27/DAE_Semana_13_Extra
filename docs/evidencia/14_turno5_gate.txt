@@ -1,0 +1,16 @@
+﻿$ python manage.py gate
+
+Compuerta: tu carrito (modo team)
+  pruebas     pasan  55   fallan  12
+              shop.tests.test_api.ApiTests.test_a_negative_price_from_the_client_changes_nothing_either
+              shop.tests.test_api.ApiTests.test_adding_an_item_returns_the_cart
+              shop.tests.test_api.ApiTests.test_bad_input_is_400
+              shop.tests.test_api.ApiTests.test_checkout_creates_the_order_and_lowers_the_stock
+              shop.tests.test_api.ApiTests.test_checkout_when_the_stock_changed_is_409_and_keeps_the_cart
+              shop.tests.test_api.ApiTests.test_more_than_the_stock_is_409
+              shop.tests.test_api.ApiTests.test_remove_more_than_there_is_leaves_no_negative_line
+              shop.tests.test_api.ApiTests.test_remove_with_a_quantity_that_is_not_a_number_is_400
+              … y 4 más
+  carritos    6 de 6 como se esperaba
+  veredicto   RECHAZAR (código de salida 1)
+[exit code: 1]

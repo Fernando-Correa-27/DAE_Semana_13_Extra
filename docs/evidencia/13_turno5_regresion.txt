@@ -1,0 +1,9 @@
+﻿$ python manage.py test shop.tests.test_lines shop.tests.test_stock shop.tests.test_totals
+...................................
+----------------------------------------------------------------------
+Ran 35 tests in 0.002s
+
+OK
+Found 35 test(s).
+System check identified no issues (0 silenced).
+[exit code: 0]

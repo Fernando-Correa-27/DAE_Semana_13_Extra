@@ -62,6 +62,50 @@ Lee la variable de entorno `SHOP_MODE` al importarse (por defecto `team`), valid
 la misma implementación. Si el modo no existe o el módulo no está en esa copia, lanza `RuntimeError`
 con un mensaje claro.
 
+## Fase B — El carrito del equipo
+
+### Por qué `remove` borra la línea al llegar a cero
+
+Una línea con cantidad cero no representa nada comprable y, si se quedara, aparecería en `lines()` y en
+la API con `qty: 0`, ensuciando la interfaz y el estado guardado en sesión. Al borrarla, el diccionario
+`_qty` solo contiene productos realmente presentes y `summary()` no muestra líneas fantasma. Si en vez
+de borrarse se permitiera una cantidad negativa, el total restaría dinero: por ejemplo, un carrito con
+`MOU-01` a −3 sumaría −119,70 al subtotal, el IGV bajaría y el cliente podría “ganar” saldo; además el
+stock se repondría al pagar y la línea no tendría sentido. La prueba
+`test_remove_more_than_there_is_never_leaves_a_negative_quantity` exige cantidad 0, lista vacía y total
+0,00.
+
+### Por qué `checkout` vuelve a comprobar las existencias
+
+Entre `add` y `checkout` puede pasar tiempo y otro cliente puede comprar las mismas unidades. `add` solo
+garantiza el stock en el instante de agregar; `checkout` es el último punto antes de cobrar y debe
+verificar **todas** las líneas antes de restar **ninguna**, para no dejar un descuento de stock a medias.
+Por eso el bucle de comprobación termina y recién después otro bucle resta. En la API, `cart_checkout`
+envuelve la operación en `transaction.atomic()` y llama a `save_stock(catalog)`; sin embargo, la
+mitigación completa contra dos compradores simultáneos requiere bloquear las filas del catálogo con
+`select_for_update()` (o un `UPDATE ... WHERE stock >= qty` atómico). Sin ese bloqueo, dos procesos
+pueden leer el mismo stock y ambos pasar la comprobación: es una condición de carrera. El laboratorio
+usa SQLite y una sola petición por prueba, así que no la reproduce, pero en producción la transacción
+con bloqueo de fila es la solución correcta.
+
+### Por qué el doble clic en «Aplicar cupón» no debe acumular
+
+`apply_coupon` guarda el código en un único atributo `self._coupon`: el segundo clic reemplaza el valor
+anterior por el mismo, y `discount()` calcula el descuento una sola vez a partir de ese valor. El
+resultado es idempotente: dos clics dejan el mismo total que uno. Si el carrito guardara una lista y
+sumara el descuento de cada elemento, un doble clic (o un reintento de red) descontaría dos veces y la
+tienda perdería dinero. Las pruebas `test_applying_the_same_coupon_twice_discounts_once` y
+`test_a_second_coupon_replaces_the_first` fijan esa regla.
+
+### Por qué el precio no puede venir del cliente
+
+El cuerpo de `POST /api/cart/items/` es dato no confiable. `add_from_payload` solo acepta un diccionario
+con `sku` de tipo `str` y pasa `sku`/`qty` a `cart.add`; cualquier `price` del cuerpo se ignora. El
+precio se toma de `self._catalog[sku].price` dentro de `lines()`. Si se aceptara el precio del cliente,
+bastaría enviar `{"sku": "LAP-01", "price": 0.01}` para comprar una laptop de S/ 2 499,90 por un céntimo;
+la prueba `test_the_price_comes_from_the_catalog_not_from_the_client` y el carrito
+`02-precio-del-cliente.json` documentan ese ataque.
+
 ### 5 bis. Float frente a Decimal (paso 5)
 
 Salida real de `python tools/decimal_check.py` (`docs/evidencia/09_turno3_decimales.txt`):

@@ -85,7 +85,12 @@ class Cart:
     def apply_coupon(self, code):
         """TODO: code without spaces and in upper case; unknown -> InvalidCoupon. One coupon per cart:
         applying again (the same or another) REPLACES it."""
-        raise NotImplementedError("TODO: apply_coupon")
+        if not isinstance(code, str):
+            raise InvalidCoupon(f"Invalid coupon: {code!r}")
+        normalized = code.strip().upper()
+        if normalized not in COUPONS:
+            raise InvalidCoupon(f"Unknown coupon: {normalized!r}")
+        self._coupon = normalized
 
     def subtotal(self):
         """TODO: sum of price * qty, rounded to cents (Decimal)."""
