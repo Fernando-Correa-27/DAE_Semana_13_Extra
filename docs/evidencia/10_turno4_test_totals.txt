@@ -1,0 +1,53 @@
+﻿$ python manage.py test shop.tests.test_totals
+E....E..EE
+======================================================================
+ERROR: test_a_discount_of_one_and_a_half_cents (shop.tests.test_totals.TotalsTests.test_a_discount_of_one_and_a_half_cents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 49, in test_a_discount_of_one_and_a_half_cents
+    self.cart.apply_coupon("BIENVENIDA10")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 88, in apply_coupon
+    raise NotImplementedError("TODO: apply_coupon")
+NotImplementedError: TODO: apply_coupon
+
+======================================================================
+ERROR: test_summary_has_the_shape_the_api_sends (shop.tests.test_totals.TotalsTests.test_summary_has_the_shape_the_api_sends)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 60, in test_summary_has_the_shape_the_api_sends
+    self.cart.apply_coupon("BIENVENIDA10")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 88, in apply_coupon
+    raise NotImplementedError("TODO: apply_coupon")
+NotImplementedError: TODO: apply_coupon
+
+======================================================================
+ERROR: test_the_discount_rounds_half_up (shop.tests.test_totals.TotalsTests.test_the_discount_rounds_half_up)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 43, in test_the_discount_rounds_half_up
+    self.cart.apply_coupon("BIENVENIDA10")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 88, in apply_coupon
+    raise NotImplementedError("TODO: apply_coupon")
+NotImplementedError: TODO: apply_coupon
+
+======================================================================
+ERROR: test_total_is_the_sum_of_its_rounded_parts (shop.tests.test_totals.TotalsTests.test_total_is_the_sum_of_its_rounded_parts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 54, in test_total_is_the_sum_of_its_rounded_parts
+    self.cart.apply_coupon("BIENVENIDA10")  # discount 6.745 -> 6.75, base 60.70
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 88, in apply_coupon
+    raise NotImplementedError("TODO: apply_coupon")
+NotImplementedError: TODO: apply_coupon
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.003s
+
+FAILED (errors=4)
+Found 10 test(s).
+System check identified no issues (0 silenced).
+[exit code: 1]
