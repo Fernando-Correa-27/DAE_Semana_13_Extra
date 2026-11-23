@@ -62,6 +62,34 @@ Lee la variable de entorno `SHOP_MODE` al importarse (por defecto `team`), valid
 la misma implementación. Si el modo no existe o el módulo no está en esa copia, lanza `RuntimeError`
 con un mensaje claro.
 
+### 5 bis. Float frente a Decimal (paso 5)
+
+Salida real de `python tools/decimal_check.py` (`docs/evidencia/09_turno3_decimales.txt`):
+
+```text
+0.1 + 0.2 = 0.30000000000000004
+Decimal('0.1') + Decimal('0.2') = 0.3
+round(0.845, 2) = 0.84
+Decimal('0.845').quantize(Decimal('0.01'), ROUND_HALF_UP) = 0.85
+```
+
+Un `float` guarda el número en binario con 53 bits de mantisa: 0,1 y 0,2 no tienen representación
+binaria finita, así que se guardan como la fracción más cercana y su suma arrastra el error
+`0.30000000000000004`. Tampoco 0,845 es exacto en binario: el valor almacenado queda ligeramente por
+debajo de 0,845, y `round()` de Python, además, redondea al par (banker's rounding), por eso devuelve
+0,84. `Decimal` guarda dígitos decimales exactos y `quantize(..., ROUND_HALF_UP)` aplica la regla de
+la tienda: 0,845 → 0,85. Por eso `money()` usa `Decimal` y `ROUND_HALF_UP` en todo el carrito.
+
+**Cálculo a mano del mousepad con `BIENVENIDA10`** (PAD-01, precio 8,45, cantidad 1):
+
+1. Subtotal = 8,45 × 1 = **8,45**.
+2. Descuento = 10 % de 8,45 = 0,845 → redondeo half-up → **0,85**.
+3. Base = 8,45 − 0,85 = **7,60**.
+4. IGV = 18 % de 7,60 = 1,368 → half-up → **1,37**.
+5. Total = 7,60 + 1,37 = **8,97**.
+
+Coincide con `test_the_discount_rounds_half_up`, que exige `discount() == 0.85` y `total() == 8.97`.
+
 ### 6. Estado inicial medido
 
 | Comando | Resultado | Evidencia |
