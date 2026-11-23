@@ -1,0 +1,45 @@
+﻿$ python manage.py test shop.tests.test_stock
+.EE....E..
+======================================================================
+ERROR: test_checkout_clears_the_coupon (shop.tests.test_stock.StockTests.test_checkout_clears_the_coupon)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 77, in test_checkout_clears_the_coupon
+    self.cart.apply_coupon("MENOS20")
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 88, in apply_coupon
+    raise NotImplementedError("TODO: apply_coupon")
+NotImplementedError: TODO: apply_coupon
+
+======================================================================
+ERROR: test_checkout_lowers_the_stock_and_empties_the_cart (shop.tests.test_stock.StockTests.test_checkout_lowers_the_stock_and_empties_the_cart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 45, in test_checkout_lowers_the_stock_and_empties_the_cart
+    order = self.cart.checkout()
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 122, in checkout
+    order = self.summary()
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 110, in summary
+    raise NotImplementedError("TODO: summary")
+NotImplementedError: TODO: summary
+
+======================================================================
+ERROR: test_the_stock_is_never_negative_after_any_sequence (shop.tests.test_stock.StockTests.test_the_stock_is_never_negative_after_any_sequence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 71, in test_the_stock_is_never_negative_after_any_sequence
+    self.cart.checkout()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 122, in checkout
+    order = self.summary()
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\cart_team.py", line 110, in summary
+    raise NotImplementedError("TODO: summary")
+NotImplementedError: TODO: summary
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.003s
+
+FAILED (errors=3)
+Found 10 test(s).
+System check identified no issues (0 silenced).
+[exit code: 1]

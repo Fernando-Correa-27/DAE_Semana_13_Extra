@@ -48,9 +48,13 @@ class Cart:
         """TODO: qty is an int >= 1 (InvalidQuantity); the sku exists (UnknownProduct);
         what is already in the cart plus qty must not exceed the stock (OutOfStock, cart unchanged)."""
         _check_qty(qty)
-        if sku not in self._catalog:
+        product = self._catalog.get(sku)
+        if product is None:
             raise UnknownProduct(f"Unknown product: {sku!r}")
-        self._qty[sku] = self._qty.get(sku, 0) + qty
+        new_qty = self._qty.get(sku, 0) + qty
+        if new_qty > product.stock:
+            raise OutOfStock(f"{sku}: requested {new_qty} and only {product.stock} available")
+        self._qty[sku] = new_qty
 
     def remove(self, sku, qty=None):
         """TODO: qty=None removes the whole line; otherwise subtract qty and drop the line when it
@@ -109,7 +113,18 @@ class Cart:
     def checkout(self):
         """TODO: empty cart -> CartError; stock is checked AGAIN (OutOfStock); on success the catalog stock
         goes down by what was bought, the cart is emptied and the summary of the order is returned."""
-        raise NotImplementedError("TODO: checkout")
+        if not self._qty:
+            raise CartError("The cart is empty")
+        # Check every line before touching any stock: a failure leaves the whole cart untouched.
+        for sku, qty in self._qty.items():
+            if qty > self._catalog[sku].stock:
+                raise OutOfStock(f"{sku}: cart has {qty} and only {self._catalog[sku].stock} available")
+        order = self.summary()
+        for sku, qty in self._qty.items():
+            self._catalog[sku].stock -= qty
+        self._qty.clear()
+        self._coupon = None
+        return order
 
 
 def add_from_payload(cart, payload):
