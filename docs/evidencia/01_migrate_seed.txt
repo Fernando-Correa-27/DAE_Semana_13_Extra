@@ -1,0 +1,7 @@
+﻿$ python manage.py migrate && python manage.py seed_shop
+Operations to perform:
+  Apply all migrations: contenttypes, sessions, shop
+Running migrations:
+  No migrations to apply.
+Catálogo cargado: 8 productos.
+[exit code: 0]

@@ -1,0 +1,7 @@
+﻿$ python --version && node --version && git --version && gh --version
+Python 3.15.2
+v26.13.1
+git version 2.56.1.windows.1
+gh version 2.104.0 (2026-11-12)
+https://github.com/cli/cli/releases/tag/v2.104.0
+[exit code: 0]
