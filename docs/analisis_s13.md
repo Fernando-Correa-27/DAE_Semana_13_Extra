@@ -106,6 +106,19 @@ bastaría enviar `{"sku": "LAP-01", "price": 0.01}` para comprar una laptop de S
 la prueba `test_the_price_comes_from_the_catalog_not_from_the_client` y el carrito
 `02-precio-del-cliente.json` documentan ese ataque.
 
+### Llamadas reales a la API (paso 9)
+
+Con `runserver` en `127.0.0.1:8013` y una misma sesión de cookies (`tools/api_smoke.ps1`):
+
+1. `POST /api/cart/items/ {"sku":"MOU-01","qty":2}` → 201; subtotal `79.80`, IGV `14.36`, total
+   `94.16`.
+2. `POST /api/cart/coupon/ {"code":"BIENVENIDA10"}` → descuento `7.98`, IGV `12.93`, total `84.75`.
+3. `POST /api/cart/checkout/ {}` → 201; devuelve el resumen de la orden con total `84.75` y deja el
+   carrito vacío (`GET /api/cart/` → `total: "0.00"`). El servidor se detuvo al terminar y
+   `seed_shop` restauró el catálogo (8 productos).
+
+Salida completa: `docs/evidencia/19_api_smoke.txt` y `20_seed_restore.txt`.
+
 ### 5 bis. Float frente a Decimal (paso 5)
 
 Salida real de `python tools/decimal_check.py` (`docs/evidencia/09_turno3_decimales.txt`):

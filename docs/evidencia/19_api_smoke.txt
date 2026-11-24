@@ -1,0 +1,67 @@
+﻿$ powershell -NoProfile -ExecutionPolicy Bypass -File tools/api_smoke.ps1
+POST http://127.0.0.1:8013/api/cart/items/  body={"sku":"MOU-01","qty":2}
+{
+    "lines":  [
+                  {
+                      "sku":  "MOU-01",
+                      "name":  "Mouse inalámbrico",
+                      "unit_price":  "39.90",
+                      "qty":  2,
+                      "line_total":  "79.80"
+                  }
+              ],
+    "coupon":  null,
+    "subtotal":  "79.80",
+    "discount":  "0.00",
+    "igv":  "14.36",
+    "total":  "94.16"
+}
+
+POST http://127.0.0.1:8013/api/cart/coupon/  body={"code":"BIENVENIDA10"}
+{
+    "lines":  [
+                  {
+                      "sku":  "MOU-01",
+                      "name":  "Mouse inalámbrico",
+                      "unit_price":  "39.90",
+                      "qty":  2,
+                      "line_total":  "79.80"
+                  }
+              ],
+    "coupon":  "BIENVENIDA10",
+    "subtotal":  "79.80",
+    "discount":  "7.98",
+    "igv":  "12.93",
+    "total":  "84.75"
+}
+
+POST http://127.0.0.1:8013/api/cart/checkout/  body={}
+{
+    "lines":  [
+                  {
+                      "sku":  "MOU-01",
+                      "name":  "Mouse inalámbrico",
+                      "unit_price":  "39.90",
+                      "qty":  2,
+                      "line_total":  "79.80"
+                  }
+              ],
+    "coupon":  "BIENVENIDA10",
+    "subtotal":  "79.80",
+    "discount":  "7.98",
+    "igv":  "12.93",
+    "total":  "84.75"
+}
+
+GET http://127.0.0.1:8013/api/cart/  (after checkout)
+{
+    "lines":  [
+
+              ],
+    "coupon":  null,
+    "subtotal":  "0.00",
+    "discount":  "0.00",
+    "igv":  "0.00",
+    "total":  "0.00"
+}
+[exit code: 0]
