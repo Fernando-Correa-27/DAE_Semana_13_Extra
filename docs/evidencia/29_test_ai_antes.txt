@@ -1,0 +1,281 @@
+﻿$ python manage.py test
+Creating test database for alias 'default'...
+
+F....EFF..FF.........F.FF...............F......F.....FFF.F.F.....FF
+======================================================================
+ERROR: test_checkout_when_the_stock_changed_is_409_and_keeps_the_cart (shop.tests.test_api.ApiTests.test_checkout_when_the_stock_changed_is_409_and_keeps_the_cart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 359, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: CHECK constraint failed: stock
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 93, in test_checkout_when_the_stock_changed_is_409_and_keeps_the_cart
+    self.assertEqual(self.post("/api/cart/checkout/", {}).status_code, 409)
+                     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 16, in post
+    return self.client.post(url, json.dumps(body), content_type="application/json")
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\test\client.py", line 1157, in post
+    response = super().post(
+        path,
+    ...<5 lines>...
+        **extra,
+    )
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\test\client.py", line 499, in post
+    return self.generic(
+           ~~~~~~~~~~~~^
+        "POST",
+        ^^^^^^^
+    ...<6 lines>...
+        **extra,
+        ^^^^^^^^
+    )
+    ^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\test\client.py", line 671, in generic
+    return self.request(**r)
+           ~~~~~~~~~~~~^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\test\client.py", line 1091, in request
+    self.check_exception(response)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\test\client.py", line 805, in check_exception
+    raise exc_value
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\core\handlers\exception.py", line 56, in inner
+    response = get_response(request)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\core\handlers\base.py", line 199, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\views\decorators\csrf.py", line 64, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\views\decorators\http.py", line 63, in inner
+    return func(request, *args, **kwargs)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\views.py", line 104, in cart_checkout
+    save_stock(catalog)
+    ~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\catalog.py", line 13, in save_stock
+    Product.objects.filter(sku=sku).update(stock=data.stock)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\models\query.py", line 1446, in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 2139, in execute_sql
+    row_count = super().execute_sql(result_type)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1643, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\.venv\Lib\site-packages\django\db\backends\sqlite3\base.py", line 359, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: CHECK constraint failed: stock
+
+======================================================================
+FAIL: test_a_negative_price_from_the_client_changes_nothing_either (shop.tests.test_api.ApiTests.test_a_negative_price_from_the_client_changes_nothing_either)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 40, in test_a_negative_price_from_the_client_changes_nothing_either
+    self.assertEqual(self.client.get("/api/cart/").json()["subtotal"], "2499.90")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '-100.00' != '2499.90'
+- -100.00
++ 2499.90
+
+
+======================================================================
+FAIL: test_more_than_the_stock_is_409 (shop.tests.test_api.ApiTests.test_more_than_the_stock_is_409)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 48, in test_more_than_the_stock_is_409
+    self.assertEqual(response.status_code, 409)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 201 != 409
+
+======================================================================
+FAIL: test_remove_more_than_there_is_leaves_no_negative_line (shop.tests.test_api.ApiTests.test_remove_more_than_there_is_leaves_no_negative_line)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 62, in test_remove_more_than_there_is_leaves_no_negative_line
+    self.assertEqual(response.json()["lines"], [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'sku': 'MOU-01', 'name': 'Mouse inalámbr[60 chars]70'}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'sku': 'MOU-01', 'name': 'Mouse inalámbrico', 'unit_price': '39.90', 'qty': -3, 'line_total': '-119.70'}
+
++ []
+- [{'line_total': '-119.70',
+-   'name': 'Mouse inalámbrico',
+-   'qty': -3,
+-   'sku': 'MOU-01',
+-   'unit_price': '39.90'}]
+
+======================================================================
+FAIL: test_the_coupon_is_applied_once_even_if_the_client_repeats_it (shop.tests.test_api.ApiTests.test_the_coupon_is_applied_once_even_if_the_client_repeats_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 73, in test_the_coupon_is_applied_once_even_if_the_client_repeats_it
+    self.assertEqual(response.json()["discount"], "18.90")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '37.80' != '18.90'
+- 37.80
++ 18.90
+
+
+======================================================================
+FAIL: test_the_price_comes_from_the_catalog_not_from_the_client (shop.tests.test_api.ApiTests.test_the_price_comes_from_the_catalog_not_from_the_client)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 35, in test_the_price_comes_from_the_catalog_not_from_the_client
+    self.assertEqual(data["lines"][0]["unit_price"], "2499.90")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '0.01' != '2499.90'
+- 0.01
++ 2499.90
+
+
+======================================================================
+FAIL: test_replay_of_the_rounding_cart_matches_your_cart (shop.tests.test_audit.AuditTests.test_replay_of_the_rounding_cart_matches_your_cart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_audit.py", line 51, in test_replay_of_the_rounding_cart_matches_your_cart
+    self.assertEqual([c for c in self.codes("06-redondeo.json", replay=True) if c.startswith("REPLAY")], [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['REPLAY_MISMATCH'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'REPLAY_MISMATCH'
+
+- ['REPLAY_MISMATCH']
++ []
+
+======================================================================
+FAIL: test_a_second_coupon_replaces_the_first (shop.tests.test_coupons.CouponTests.test_a_second_coupon_replaces_the_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_coupons.py", line 51, in test_a_second_coupon_replaces_the_first
+    self.assertEqual(self.cart.discount(), Decimal("20.00"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('38.9') != Decimal('20.00')
+
+======================================================================
+FAIL: test_applying_the_same_coupon_twice_discounts_once (shop.tests.test_coupons.CouponTests.test_applying_the_same_coupon_twice_discounts_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_coupons.py", line 45, in test_applying_the_same_coupon_twice_discounts_once
+    self.assertEqual(self.cart.discount(), Decimal("18.90"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('37.8') != Decimal('18.90')
+
+======================================================================
+FAIL: test_remove_more_than_there_is_never_leaves_a_negative_quantity (shop.tests.test_lines.LinesTests.test_remove_more_than_there_is_never_leaves_a_negative_quantity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_lines.py", line 70, in test_remove_more_than_there_is_never_leaves_a_negative_quantity
+    self.assertEqual(self.cart.qty_of("MOU-01"), 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: -3 != 0
+
+======================================================================
+FAIL: test_checkout_checks_the_stock_again (shop.tests.test_stock.StockTests.test_checkout_checks_the_stock_again)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 60, in test_checkout_checks_the_stock_again
+    with self.assertRaises(OutOfStock):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: OutOfStock not raised
+
+======================================================================
+FAIL: test_the_stock_counts_what_is_already_in_the_cart (shop.tests.test_stock.StockTests.test_the_stock_counts_what_is_already_in_the_cart)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 26, in test_the_stock_counts_what_is_already_in_the_cart
+    with self.assertRaises(OutOfStock):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: OutOfStock not raised
+
+======================================================================
+FAIL: test_the_stock_is_never_negative_after_any_sequence (shop.tests.test_stock.StockTests.test_the_stock_is_never_negative_after_any_sequence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 72, in test_the_stock_is_never_negative_after_any_sequence
+    self.assertGreaterEqual(self.catalog["PAD-01"].stock, 0)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: -2 not greater than or equal to 0
+
+======================================================================
+FAIL: test_two_adds_cannot_get_around_the_stock (shop.tests.test_stock.StockTests.test_two_adds_cannot_get_around_the_stock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_stock.py", line 32, in test_two_adds_cannot_get_around_the_stock
+    with self.assertRaises(OutOfStock):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: OutOfStock not raised
+
+======================================================================
+FAIL: test_a_discount_of_one_and_a_half_cents (shop.tests.test_totals.TotalsTests.test_a_discount_of_one_and_a_half_cents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 50, in test_a_discount_of_one_and_a_half_cents
+    self.assertEqual(self.cart.discount(), Decimal("0.11"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('0.1') != Decimal('0.11')
+
+======================================================================
+FAIL: test_igv_rounds_half_up (shop.tests.test_totals.TotalsTests.test_igv_rounds_half_up)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 38, in test_igv_rounds_half_up
+    self.assertEqual(self.cart.igv(), Decimal("452.21"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('452.2') != Decimal('452.21')
+
+======================================================================
+FAIL: test_the_discount_rounds_half_up (shop.tests.test_totals.TotalsTests.test_the_discount_rounds_half_up)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 44, in test_the_discount_rounds_half_up
+    self.assertEqual(self.cart.discount(), Decimal("0.85"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('0.84') != Decimal('0.85')
+
+======================================================================
+FAIL: test_total_is_the_sum_of_its_rounded_parts (shop.tests.test_totals.TotalsTests.test_total_is_the_sum_of_its_rounded_parts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_totals.py", line 55, in test_total_is_the_sum_of_its_rounded_parts
+    self.assertEqual(self.cart.subtotal() - self.cart.discount() + self.cart.igv(), self.cart.total())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('71.63') != Decimal('71.64')
+
+----------------------------------------------------------------------
+Ran 67 tests in 0.046s
+
+FAILED (failures=17, errors=1)
+Destroying test database for alias 'default'...
+
+Found 67 test(s).
+System check identified no issues (0 silenced).
+[exit code: 1]

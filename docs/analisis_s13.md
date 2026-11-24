@@ -255,6 +255,82 @@ dinero. La auditoría es una red de seguridad para revisar código y datos, no l
 - `carts[].result`: `05-cupon-doble.json` y `06-redondeo.json` aparecen como `calcula_distinto`;
   los demás como `ok` (el replay no reproduce el precio del cliente ni las secuencias de stock).
 
+## Fase E — Estado original y arreglos de la IA
+
+Commit del estado original: `6978401` (`chore: snapshot original AI cart before fixes`), etiqueta
+`ai-original`. Antes de tocar el archivo: `SHOP_MODE=ai python manage.py test` →
+`FAILED (failures=17, errors=1)` = 18 pruebas únicas en rojo (`docs/evidencia/29_test_ai_antes.txt`).
+
+| Arreglo | Commit | Fallas antes | Fallas después | Qué cambió |
+|---|---|---|---|---|
+| 1. Redondeo con flotantes | `bbb4251` | 18 | 13 | `IGV` a `Decimal("0.18")`; `_money` usa `money`; `_subtotal` y `_discount` en `Decimal`, con el descuento redondeado antes de calcular la base |
+| 2. Precio del cliente | `2138c41` | 13 | 11 | `add` sin `price`; se elimina `_prices`; `lines` lee el catálogo; `add_from_payload` no pasa `price` |
+| 3. Existencias | `e69e6db` | 11 | 5 | `add` compara `lo_que_hay + qty`; `checkout` re-verifica todas las líneas antes de restar |
+| 4. Cantidad negativa | `32489e4` | 5 | 3 | `remove` calcula el resto y borra la línea si es `<= 0` |
+| 5. Descuento acumulado | `e2f1be2` | 3 | 0 | `apply_coupon` reemplaza (`_coupons = [code]`); `_discount` usa solo el primer cupón; `from_state` conserva el último |
+
+Después: `SHOP_MODE=ai python manage.py test` → 67/67 (`38_test_ai_fix5_cupon.txt`); `gate --modo ai`
+→ `ACEPTAR`, código 0, 6/6 carritos (`39_gate_ai_despues.txt`, `40_gate_ai_json_despues.txt`).
+
+### Por qué una implementación correcta debe rechazar los carritos 03 y 04
+
+`shop/gate.py` define `MUST_REJECT = {"BAD_QTY", "UNKNOWN_SKU", "OVER_STOCK"}`. El carrito 03 declara
+`PAD-01` con 4 unidades cuando el catálogo tiene 2 → `OVER_STOCK`; el 04 declara `MOU-01` con −3 →
+`BAD_QTY`. Para esos dos, `expected_outcome()` devuelve `"rechazar"` y `judge_cart()` solo da `"ok"` si
+el replay produce `REPLAY_REJECTED`. Una implementación correcta lanza `OutOfStock` al agregar 4 sobre
+2 y `InvalidQuantity` al agregar −3, así que el replay las rechaza. Si las aceptara, el resultado sería
+`"acepta_lo_que_debia_rechazar"` y la compuerta no podría aceptar. Rechazar esos carritos **no** es un
+fallo: es la prueba de que las reglas de cantidad y stock están puestas.
+
+### Por qué el replay no detecta el precio del cliente
+
+`shop/audit.py::_replay` reconstruye con `cart.add(item["sku"], item["qty"])`, **sin** pasar
+`unit_price`. El carrito 02 declara `LAP-01` a 0,01, pero el replay llama a `add("LAP-01", 1)` y la IA
+usa el precio del catálogo; por eso no hay `REPLAY_MISMATCH` y el replay “pasa”. La parte que sí lo
+detecta es el **escaneo de la declaración**: `audit_cart()` compara `item["unit_price"]` con
+`product.price` y emite `PRICE_MISMATCH`. Sin embargo, `gate.judge_cart()` no rechaza por
+`PRICE_MISMATCH` (no está en `MUST_REJECT`), así que la compuerta lo detecta por el **otro oráculo**:
+la prueba `test_the_price_comes_from_the_catalog_not_from_the_client` falla mientras `add` acepte
+`price`. En resumen: el replay audita el cálculo, no la procedencia del precio; la prueba de la API y
+el `PRICE_MISMATCH` de la auditoría auditan la procedencia.
+
+### Auditoría después de los arreglos
+
+`41_audit_ai_replay_despues.txt`: 01 limpio; 02 conserva `PRICE_MISMATCH` y sus `TOTAL_MISMATCH`
+(la declaración sigue siendo falsa); 03 y 04 dan `REPLAY_REJECTED` (correcto); 05 y 06 ya **no**
+tienen `REPLAY_MISMATCH`, aunque sus declaraciones siguen mal. `42_audit_ai_strict_despues.txt`
+termina con código 1 porque los datos declarados de 02–06 son incorrectos: una implementación
+correcta no convierte en correctos los carritos mal declarados, solo deja de calcularlos mal.
+
+## Fase F — Rechazo documentado (de ejercicio)
+
+Con la IA ya en verde, se probó un parche **tentador**: dejar que `_subtotal` sume con `float` y
+“arreglar” el redondeo convirtiendo a `Decimal` con `Decimal(str(value))`. Las 67 pruebas pasan y la
+compuerta acepta, pero el diff viola la pregunta 1: el dinero pasa por `float` y ya no se usa el
+helper `money`. Es un **rechazo de ejercicio**, no un rechazo espontáneo: se aplicó a propósito para
+demostrar que la compuerta no sustituye la revisión humana.
+
+Diff guardado en `docs/evidencia/rechazo_01.diff`:
+
+```diff
+-from decimal import Decimal
++from decimal import ROUND_HALF_UP, Decimal
+...
+ def _money(value):
+-    return money(value)
++    return Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+...
+     def _subtotal(self):
+-        return money(sum((l.unit_price * l.qty for l in self.lines()), Decimal("0")))
++        return _money(sum((float(l.unit_price) * l.qty for l in self.lines()), 0.0))
+```
+
+Resultado de la compuerta con el parche: `67/67`, `6/6` carritos, `ACEPTAR` (código 0)
+(`44_rechazo_01_gate.txt`). La pregunta 1 lo rechaza porque `float(l.unit_price) * l.qty` introduce
+binario en una suma de dinero y `Decimal(str(value))` convierte el float ya contaminado; el helper
+`money` de `shop/domain.py` deja de usarse. Se revirtió con `git checkout -- shop/cart_ai.py` y la
+compuerta volvió a `ACEPTAR` (`45_rechazo_01_revertido_gate.txt`).
+
 ### 6. Estado inicial medido
 
 | Comando | Resultado | Evidencia |

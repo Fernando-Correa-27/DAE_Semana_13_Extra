@@ -1,0 +1,29 @@
+diff --git a/shop/cart_ai.py b/shop/cart_ai.py
+index 8b0f5b9..7da94e4 100644
+--- a/shop/cart_ai.py
++++ b/shop/cart_ai.py
+@@ -1,5 +1,5 @@
+ """Shopping cart written by an AI assistant (version under review)."""
+-from decimal import Decimal
++from decimal import ROUND_HALF_UP, Decimal
+ 
+ from shop.domain import (
+     COUPONS,
+@@ -16,7 +16,7 @@ IGV = Decimal("0.18")
+ 
+ 
+ def _money(value):
+-    return money(value)
++    return Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+ 
+ 
+ def _check_qty(qty):
+@@ -79,7 +79,7 @@ class Cart:
+         self._coupons = [code]
+ 
+     def _subtotal(self):
+-        return money(sum((l.unit_price * l.qty for l in self.lines()), Decimal("0")))
++        return _money(sum((float(l.unit_price) * l.qty for l in self.lines()), 0.0))
+ 
+     def _discount(self):
+         subtotal = self._subtotal()
