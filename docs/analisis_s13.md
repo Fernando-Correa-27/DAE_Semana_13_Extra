@@ -147,6 +147,114 @@ la tienda: 0,845 → 0,85. Por eso `money()` usa `Decimal` y `ROUND_HALF_UP` en 
 
 Coincide con `test_the_discount_rounds_half_up`, que exige `discount() == 0.85` y `total() == 8.97`.
 
+## Fase C — El duelo
+
+Salida real de `python manage.py duelo` (`docs/evidencia/21_duelo.txt`):
+
+| Modo | Implementación | Pasan | Fallan |
+|---|---|---|---|
+| `team` | tu carrito | 67 | 0 |
+| `ai` | el carrito de la IA | 49 | 18 |
+
+Fallos de la IA agrupados por archivo (`docs/evidencia/22_duelo_ai.txt`):
+
+- `shop/tests/test_api.py` (6): `test_checkout_when_the_stock_changed_is_409_and_keeps_the_cart`
+  (ERROR, `CHECK constraint failed: stock`), `test_a_negative_price_from_the_client_changes_nothing_either`,
+  `test_more_than_the_stock_is_409`, `test_remove_more_than_there_is_leaves_no_negative_line`,
+  `test_the_coupon_is_applied_once_even_if_the_client_repeats_it`,
+  `test_the_price_comes_from_the_catalog_not_from_the_client`.
+- `shop/tests/test_audit.py` (1): `test_replay_of_the_rounding_cart_matches_your_cart`.
+- `shop/tests/test_coupons.py` (2): `test_a_second_coupon_replaces_the_first`,
+  `test_applying_the_same_coupon_twice_discounts_once`.
+- `shop/tests/test_lines.py` (1): `test_remove_more_than_there_is_never_leaves_a_negative_quantity`.
+- `shop/tests/test_stock.py` (4): `test_checkout_checks_the_stock_again`,
+  `test_the_stock_counts_what_is_already_in_the_cart`, `test_the_stock_is_never_negative_after_any_sequence`,
+  `test_two_adds_cannot_get_around_the_stock`.
+- `shop/tests/test_totals.py` (4): `test_a_discount_of_one_and_a_half_cents`, `test_igv_rounds_half_up`,
+  `test_the_discount_rounds_half_up`, `test_total_is_the_sum_of_its_rounded_parts`.
+
+## Fase D — Los cinco fallos de la IA, clasificados sin tocar el archivo
+
+### Tabla de los cinco fallos
+
+| # | Archivo:línea | Fallo | Prueba que lo detecta | Mensaje / diferencia real | Causa | ¿Se vería a mano en una tienda? | Marca |
+|---|---|---|---|---|---|---|---|
+| 1 | `shop/cart_ai.py:14`, `17-18`, `83-84`, `92-94`, `104` | Redondeo con flotantes | `test_totals` (4), `test_audit.test_replay_of_the_rounding_cart_matches_your_cart` | `Decimal('0.84') != Decimal('0.85')`; `Decimal('452.2') != Decimal('452.21')`; `Decimal('0.1') != Decimal('0.11')`; `Decimal('71.63') != Decimal('71.64')`; `REPLAY_MISMATCH` | `_money` usa `round(value, 2)` sobre `float`; `_subtotal` suma `float`; `IGV = 0.18` es `float` | Sí, con valores de medio céntimo: un mousepad de S/ 8,45 con 10 % debe descontar 0,85 y la IA descuenta 0,84; el cliente ve un céntimo de diferencia | Cálculo |
+| 2 | `shop/cart_ai.py:45`, `53`, `139` | Precio tomado del cliente | `test_api.test_the_price_comes_from_the_catalog_not_from_the_client`, `test_api.test_a_negative_price_from_the_client_changes_nothing_either`; auditoría: `PRICE_MISMATCH` en `02-precio-del-cliente.json` | `'0.01' != '2499.90'`; `'-100.00' != '2499.90'`; la petición con `price` devuelve 201 | `add(..., price=None)` guarda `Decimal(str(price))` en `_prices` y `add_from_payload` pasa `payload.get("price")` | Solo si alguien manipula la petición; en la pantalla normal no se nota, pero permite comprar una laptop de S/ 2 499,90 por S/ 0,01 | **Seguridad** y **solo API** |
+| 3 | `shop/cart_ai.py:50` y `124-133` | Existencias que no cuentan lo ya agregado (y checkout no re-verifica) | `test_stock` (4), `test_api.test_more_than_the_stock_is_409`, `test_api.test_checkout_when_the_stock_changed_is_409_and_keeps_the_cart`; `OVER_STOCK` en `03-stock.json` | `OutOfStock not raised`; `201 != 409`; `-2 not greater than or equal to 0`; `CHECK constraint failed: stock` | `add` compara solo `qty > product.stock`, no `self._qty.get(sku,0)+qty`; `checkout` resta sin volver a comprobar | Sí: con 2 mousepads en stock, agregar 2 y luego 1 deja 3 en el carrito; al pagar se vende stock inexistente y el inventario queda negativo | Existencias |
+| 4 | `shop/cart_ai.py:55-66` (línea 63) | Cantidad negativa al quitar | `test_lines.test_remove_more_than_there_is_never_leaves_a_negative_quantity`, `test_api.test_remove_more_than_there_is_leaves_no_negative_line` | `-3 != 0`; la línea queda con `qty: -2` y el total baja | `self._qty[sku] -= qty` sin tope; solo borra si queda exactamente 0 | Sí: quitar 5 unidades cuando hay 2 deja la línea en −3 y el total se vuelve negativo; el cliente “gana” dinero | Cantidad |
+| 5 | `shop/cart_ai.py:77-81`, `89-95` | Descuento acumulado dos veces | `test_coupons` (2), `test_api.test_the_coupon_is_applied_once_even_if_the_client_repeats_it`; `MULTIPLE_COUPONS` en `05-cupon-doble.json` | `Decimal('37.8') != Decimal('18.90')`; `'37.80' != '18.90'`; `Decimal('38.9') != Decimal('20.00')`; `REPLAY_MISMATCH` | `apply_coupon` hace `append` a una lista y `_discount` suma el descuento de todos los cupones | Sí: un doble clic en «Aplicar cupón» descuenta dos veces el 10 %; el cliente paga menos de lo que corresponde | Idempotencia |
+
+El fallo de **seguridad** es el 2: acepta el precio que manda el cliente. Es también el único que
+**solo se ve con la API**, porque el camino `add_from_payload` es el que traduce el cuerpo HTTP; las
+pruebas puras del carrito no envían `price`. Los fallos 1, 3, 4 y 5 se reproducen directamente sobre
+`Cart` y por eso aparecen en `test_totals`, `test_stock`, `test_lines` y `test_coupons`. El fallo 3
+tiene además manifestaciones HTTP (`409` que no llega y el `CHECK constraint failed: stock`), pero su
+raíz es la misma regla de existencias.
+
+### Las cuatro preguntas de revisión aplicadas a `cart_ai.py`
+
+1. **¿Todo el dinero es `Decimal` de principio a fin, con `ROUND_HALF_UP`? No.** La línea 14 define
+   `IGV = 0.18` como `float`; la 18 hace `Decimal(str(round(value, 2)))`, que primero redondea en
+   binario; la 84 suma `float(l.unit_price) * l.qty`; las líneas 92 y 94 acumulan `float`; la 104
+   mezcla ese `float` con el IGV. El resultado es 0,84 donde la regla pide 0,85.
+2. **¿El servidor es la única fuente del precio? No.** La línea 45 acepta `price=None`; la 53 guarda
+   `Decimal(str(price))` si el cliente lo envía; la 139 le pasa `payload.get("price")`. El catálogo
+   deja de ser la única fuente.
+3. **¿Cada regla de cantidad y existencias se cumple con cualquier secuencia? No.** La línea 50
+   compara `qty > product.stock` sin sumar `self._qty.get(sku, 0)`, así que dos `add` seguidos se
+   saltan el stock. La línea 63 resta sin tope y deja cantidades negativas. Las líneas 124-133 no
+   vuelven a comprobar el stock antes de restar en `checkout`.
+4. **¿Repetir una acción da el mismo resultado? No.** La línea 81 hace `self._coupons.append(code)` y
+   las líneas 89-95 recorren y suman **todos** los cupones; aplicar dos veces `BIENVENIDA10` descuenta
+   37,80 en vez de 18,90.
+
+### Auditoría antes de los arreglos (IA rota)
+
+Salida completa: `docs/evidencia/23_audit_ai_antes.txt` (sin replay) y
+`24_audit_ai_replay_antes.txt` (con replay).
+
+| Carrito | Sin `--replay` | Con `--replay` | Fallo |
+|---|---|---|---|
+| `01-correcto.json` | Sin hallazgos | Sin hallazgos | — |
+| `02-precio-del-cliente.json` | `PRICE_MISMATCH` (0.01 vs 2499.90) + 3 `TOTAL_MISMATCH` | Igual; **no** hay `REPLAY_MISMATCH` | 2 (precio del cliente) |
+| `03-stock.json` | `OVER_STOCK` (4 unidades, hay 2) | `REPLAY_REJECTED` (la IA rechaza 4 > 2) | 3 (existencias) |
+| `04-cantidad-negativa.json` | `BAD_QTY` (−3) + 3 `TOTAL_MISMATCH` | `REPLAY_REJECTED` (la IA rechaza −3 en `add`) | 4 (cantidad negativa) |
+| `05-cupon-doble.json` | `MULTIPLE_COUPONS` + 3 `TOTAL_MISMATCH` | `REPLAY_MISMATCH` en descuento, IGV y total | 5 (cupón acumulado) |
+| `06-redondeo.json` | `TOTAL_MISMATCH` (0.84 vs 0.85) | `REPLAY_MISMATCH` (0.84 vs 0.85) | 1 (redondeo) |
+
+**`TOTAL_MISMATCH` frente a `REPLAY_MISMATCH`.** El primero compara lo que el archivo **declara**
+(`declared`) con `reference_totals()`; señala que el carrito está mal documentado o que quien lo
+generó calculó mal. El segundo compara lo que **calcula la implementación activa** al reconstruir el
+carrito (`--replay`) con la misma fórmula; señala un defecto del código, aunque la declaración fuera
+correcta. En `06` se ven los dos: la declaración dice 0,84 y el replay de la IA también da 0,84,
+mientras la fórmula manda 0,85. En `02` solo hay `TOTAL_MISMATCH`/`PRICE_MISMATCH`: el replay usa
+`cart.add(sku, qty)` **sin precio**, así que la IA cae en `product.price` y calcula bien; el defecto
+de aceptar el precio del cliente no se reproduce en el replay.
+
+### `--json`, `--strict` y el límite de la auditoría
+
+`25_audit_ai_json_antes.txt` devuelve un objeto con `mode` y `carts[]` (`file`, `ok`, `findings[]`).
+Un programa puede leer `findings[].code` y decidir; un agente puede tomar el primer hallazgo, ubicar
+la línea y proponer un parche. `26_audit_ai_strict_antes.txt` termina con
+`CommandError: 5 carrito(s) con hallazgos.` y **código de salida 1**, útil para un pipeline de CI.
+
+La auditoría **no sustituye las reglas del servidor**: examina un carrito ya declarado o reconstruido
+y avisa **después** de que el cálculo ocurrió; no impide que una petición con `price` o con cantidad
+negativa llegue a cobrarse. La defensa previa es `add`, `remove`, `checkout` y `add_from_payload` en el
+carrito: si la regla está en el servidor, la petición mala se rechaza **antes** de tocar el stock o el
+dinero. La auditoría es una red de seguridad para revisar código y datos, no la puerta de entrada.
+
+### Compuerta de la IA antes de los arreglos
+
+`27_gate_ai_antes.txt`: 49 pasan / 18 fallan, 4 de 6 carritos como se esperaba, veredicto `RECHAZAR`
+(código 1). `28_gate_ai_json_antes.txt` permite a un agente leer:
+
+- `verdict`: `"rechazar"`.
+- `tests.failing`: los 18 nombres dotted de las pruebas que fallan.
+- `carts[].result`: `05-cupon-doble.json` y `06-redondeo.json` aparecen como `calcula_distinto`;
+  los demás como `ok` (el replay no reproduce el precio del cliente ni las secuencias de stock).
+
 ### 6. Estado inicial medido
 
 | Comando | Resultado | Evidencia |
