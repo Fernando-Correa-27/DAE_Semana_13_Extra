@@ -1,0 +1,72 @@
+﻿$ python manage.py test
+Creating test database for alias 'default'...
+
+.......F..F............FF...............F..........................
+======================================================================
+FAIL: test_remove_more_than_there_is_leaves_no_negative_line (shop.tests.test_api.ApiTests.test_remove_more_than_there_is_leaves_no_negative_line)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 62, in test_remove_more_than_there_is_leaves_no_negative_line
+    self.assertEqual(response.json()["lines"], [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'sku': 'MOU-01', 'name': 'Mouse inalámbr[60 chars]70'}] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+{'sku': 'MOU-01', 'name': 'Mouse inalámbrico', 'unit_price': '39.90', 'qty': -3, 'line_total': '-119.70'}
+
++ []
+- [{'line_total': '-119.70',
+-   'name': 'Mouse inalámbrico',
+-   'qty': -3,
+-   'sku': 'MOU-01',
+-   'unit_price': '39.90'}]
+
+======================================================================
+FAIL: test_the_coupon_is_applied_once_even_if_the_client_repeats_it (shop.tests.test_api.ApiTests.test_the_coupon_is_applied_once_even_if_the_client_repeats_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 73, in test_the_coupon_is_applied_once_even_if_the_client_repeats_it
+    self.assertEqual(response.json()["discount"], "18.90")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '37.80' != '18.90'
+- 37.80
++ 18.90
+
+
+======================================================================
+FAIL: test_a_second_coupon_replaces_the_first (shop.tests.test_coupons.CouponTests.test_a_second_coupon_replaces_the_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_coupons.py", line 51, in test_a_second_coupon_replaces_the_first
+    self.assertEqual(self.cart.discount(), Decimal("20.00"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('38.90') != Decimal('20.00')
+
+======================================================================
+FAIL: test_applying_the_same_coupon_twice_discounts_once (shop.tests.test_coupons.CouponTests.test_applying_the_same_coupon_twice_discounts_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_coupons.py", line 45, in test_applying_the_same_coupon_twice_discounts_once
+    self.assertEqual(self.cart.discount(), Decimal("18.90"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('37.80') != Decimal('18.90')
+
+======================================================================
+FAIL: test_remove_more_than_there_is_never_leaves_a_negative_quantity (shop.tests.test_lines.LinesTests.test_remove_more_than_there_is_never_leaves_a_negative_quantity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_lines.py", line 70, in test_remove_more_than_there_is_never_leaves_a_negative_quantity
+    self.assertEqual(self.cart.qty_of("MOU-01"), 0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: -3 != 0
+
+----------------------------------------------------------------------
+Ran 67 tests in 0.041s
+
+FAILED (failures=5)
+Destroying test database for alias 'default'...
+
+Found 67 test(s).
+System check identified no issues (0 silenced).
+[exit code: 1]
