@@ -1,0 +1,13 @@
+﻿$ python manage.py test
+Creating test database for alias 'default'...
+
+...................................................................
+----------------------------------------------------------------------
+Ran 67 tests in 0.039s
+
+OK
+Destroying test database for alias 'default'...
+
+Found 67 test(s).
+System check identified no issues (0 silenced).
+[exit code: 0]

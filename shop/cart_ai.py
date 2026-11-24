@@ -37,7 +37,7 @@ class Cart:
     def from_state(cls, catalog, state):
         cart = cls(catalog)
         cart._qty = {sku: int(q) for sku, q in state.get("qty", {}).items() if sku in catalog}
-        cart._coupons = list(state.get("coupons", []))
+        cart._coupons = list(state.get("coupons", []))[-1:]
         return cart
 
     def add(self, sku, qty=1):
@@ -76,7 +76,7 @@ class Cart:
         code = (code or "").strip().upper()
         if code not in COUPONS:
             raise InvalidCoupon(f"Cupón desconocido: {code!r}")
-        self._coupons.append(code)
+        self._coupons = [code]
 
     def _subtotal(self):
         return money(sum((l.unit_price * l.qty for l in self.lines()), Decimal("0")))
@@ -84,7 +84,7 @@ class Cart:
     def _discount(self):
         subtotal = self._subtotal()
         total_discount = Decimal("0")
-        for code in self._coupons:
+        for code in self._coupons[:1]:
             kind, amount = COUPONS[code]
             if kind == "percent":
                 total_discount += subtotal * amount / 100
