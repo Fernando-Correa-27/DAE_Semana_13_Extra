@@ -1,0 +1,13 @@
+﻿$ python manage.py test shop.tests.test_api
+Creating test database for alias 'default'...
+
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 0.063s
+
+OK
+Destroying test database for alias 'default'...
+
+Found 14 test(s).
+System check identified no issues (0 silenced).
+[exit code: 0]
