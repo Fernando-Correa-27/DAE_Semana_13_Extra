@@ -1,0 +1,43 @@
+﻿$ python manage.py test
+Creating test database for alias 'default'...
+
+..........F............FF..........................................
+======================================================================
+FAIL: test_the_coupon_is_applied_once_even_if_the_client_repeats_it (shop.tests.test_api.ApiTests.test_the_coupon_is_applied_once_even_if_the_client_repeats_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_api.py", line 73, in test_the_coupon_is_applied_once_even_if_the_client_repeats_it
+    self.assertEqual(response.json()["discount"], "18.90")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '37.80' != '18.90'
+- 37.80
++ 18.90
+
+
+======================================================================
+FAIL: test_a_second_coupon_replaces_the_first (shop.tests.test_coupons.CouponTests.test_a_second_coupon_replaces_the_first)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_coupons.py", line 51, in test_a_second_coupon_replaces_the_first
+    self.assertEqual(self.cart.discount(), Decimal("20.00"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('38.90') != Decimal('20.00')
+
+======================================================================
+FAIL: test_applying_the_same_coupon_twice_discounts_once (shop.tests.test_coupons.CouponTests.test_applying_the_same_coupon_twice_discounts_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Usuario\Downloads\DAE_Semana_13_Extra\shop\tests\test_coupons.py", line 45, in test_applying_the_same_coupon_twice_discounts_once
+    self.assertEqual(self.cart.discount(), Decimal("18.90"))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Decimal('37.80') != Decimal('18.90')
+
+----------------------------------------------------------------------
+Ran 67 tests in 0.038s
+
+FAILED (failures=3)
+Destroying test database for alias 'default'...
+
+Found 67 test(s).
+System check identified no issues (0 silenced).
+[exit code: 1]

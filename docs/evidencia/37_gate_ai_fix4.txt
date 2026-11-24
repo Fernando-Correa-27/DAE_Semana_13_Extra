@@ -1,0 +1,49 @@
+﻿$ python manage.py gate --modo ai --json
+{
+  "mode": "ai",
+  "tests": {
+    "total": 67,
+    "passed": 64,
+    "failed": 3,
+    "failing": [
+      "shop.tests.test_api.ApiTests.test_the_coupon_is_applied_once_even_if_the_client_repeats_it",
+      "shop.tests.test_coupons.CouponTests.test_a_second_coupon_replaces_the_first",
+      "shop.tests.test_coupons.CouponTests.test_applying_the_same_coupon_twice_discounts_once"
+    ]
+  },
+  "carts": [
+    {
+      "file": "01-correcto.json",
+      "expected": "totales",
+      "result": "ok"
+    },
+    {
+      "file": "02-precio-del-cliente.json",
+      "expected": "totales",
+      "result": "ok"
+    },
+    {
+      "file": "03-stock.json",
+      "expected": "rechazar",
+      "result": "ok"
+    },
+    {
+      "file": "04-cantidad-negativa.json",
+      "expected": "rechazar",
+      "result": "ok"
+    },
+    {
+      "file": "05-cupon-doble.json",
+      "expected": "totales",
+      "result": "calcula_distinto"
+    },
+    {
+      "file": "06-redondeo.json",
+      "expected": "totales",
+      "result": "ok"
+    }
+  ],
+  "verdict": "rechazar",
+  "exit_code": 1
+}
+[exit code: 1]
