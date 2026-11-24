@@ -9,13 +9,14 @@ from shop.domain import (
     Line,
     OutOfStock,
     UnknownProduct,
+    money,
 )
 
-IGV = 0.18
+IGV = Decimal("0.18")
 
 
 def _money(value):
-    return Decimal(str(round(value, 2)))
+    return money(value)
 
 
 def _check_qty(qty):
@@ -81,18 +82,18 @@ class Cart:
         self._coupons.append(code)
 
     def _subtotal(self):
-        return sum(float(l.unit_price) * l.qty for l in self.lines())
+        return money(sum((l.unit_price * l.qty for l in self.lines()), Decimal("0")))
 
     def _discount(self):
         subtotal = self._subtotal()
-        total_discount = 0.0
+        total_discount = Decimal("0")
         for code in self._coupons:
             kind, amount = COUPONS[code]
             if kind == "percent":
-                total_discount += subtotal * float(amount) / 100
+                total_discount += subtotal * amount / 100
             else:
-                total_discount += min(float(amount), subtotal)
-        return total_discount
+                total_discount += min(amount, subtotal)
+        return money(total_discount)
 
     def subtotal(self):
         return _money(self._subtotal())
