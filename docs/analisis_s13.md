@@ -338,3 +338,12 @@ compuerta volvió a `ACEPTAR` (`45_rechazo_01_revertido_gate.txt`).
 | `python manage.py test` | 67 pruebas, 2 fallos + 67 errores de subTest; 7 pasan | `02_test_inicial_equipo.txt` |
 | `python manage.py gate` | `RECHAZAR`, código 1; 7 pasan / 60 fallan; 0/6 carritos | `03_gate_inicial_equipo.txt` |
 | `python manage.py gate --modo ai` | `RECHAZAR`, código 1; 49 pasan / 18 fallan; 4/6 carritos | `04_gate_inicial_ai.txt` |
+
+## Entregable y verificación final
+
+El entregable se construye con `tools/build_report.py` (python-docx) a partir de este análisis y de
+`docs/evidencia/`. Se generó `entregable/DAE_S13_Extra_Entregable.docx` y su PDF
+(`entregable/DAE_S13_Extra_Entregable.pdf`, 25 páginas) con Word. El árbol real de los archivos
+versionados está en `docs/evidencia/53_tree.txt`. La verificación final quedó en
+`46_test_final_equipo.txt` a `52_seed_restore_final.txt`: 67/67 pruebas en ambos modos, compuertas
+`ACEPTAR` con código 0 y catálogo restaurado con 8 productos.
