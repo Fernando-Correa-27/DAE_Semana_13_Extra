@@ -1,0 +1,118 @@
+$ git ls-files | tree
+.
+├── carts
+│   ├── 01-correcto.json
+│   ├── 02-precio-del-cliente.json
+│   ├── 03-stock.json
+│   ├── 04-cantidad-negativa.json
+│   ├── 05-cupon-doble.json
+│   └── 06-redondeo.json
+├── config
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── docs
+│   ├── evidencia
+│   │   ├── 00_entorno.txt
+│   │   ├── 01_migrate_seed.txt
+│   │   ├── 02_test_inicial_equipo.txt
+│   │   ├── 03_gate_inicial_equipo.txt
+│   │   ├── 04_gate_inicial_ai.txt
+│   │   ├── 05_turno1_test_lines.txt
+│   │   ├── 06_turno1_gate_json.txt
+│   │   ├── 07_turno2_test_stock.txt
+│   │   ├── 08_turno2_gate.txt
+│   │   ├── 09_turno3_decimales.txt
+│   │   ├── 10_turno4_test_totals.txt
+│   │   ├── 11_turno4_gate.txt
+│   │   ├── 12_turno5_test_coupons.txt
+│   │   ├── 13_turno5_regresion.txt
+│   │   ├── 14_turno5_gate.txt
+│   │   ├── 15_turno6_test_api.txt
+│   │   ├── 16_turno6_test_completo.txt
+│   │   ├── 17_turno6_gate_equipo.txt
+│   │   ├── 18_turno6_gate_json.txt
+│   │   ├── 19_api_smoke.txt
+│   │   ├── 20_seed_restore.txt
+│   │   ├── 21_duelo.txt
+│   │   ├── 22_duelo_ai.txt
+│   │   ├── 23_audit_ai_antes.txt
+│   │   ├── 24_audit_ai_replay_antes.txt
+│   │   ├── 25_audit_ai_json_antes.txt
+│   │   ├── 26_audit_ai_strict_antes.txt
+│   │   ├── 27_gate_ai_antes.txt
+│   │   ├── 28_gate_ai_json_antes.txt
+│   │   ├── 29_test_ai_antes.txt
+│   │   ├── 30_test_ai_fix1_redondeo.txt
+│   │   ├── 31_gate_ai_fix1.txt
+│   │   ├── 32_test_ai_fix2_precio.txt
+│   │   ├── 33_gate_ai_fix2.txt
+│   │   ├── 34_test_ai_fix3_stock.txt
+│   │   ├── 35_gate_ai_fix3.txt
+│   │   ├── 36_test_ai_fix4_quitar.txt
+│   │   ├── 37_gate_ai_fix4.txt
+│   │   ├── 38_test_ai_fix5_cupon.txt
+│   │   ├── 39_gate_ai_despues.txt
+│   │   ├── 40_gate_ai_json_despues.txt
+│   │   ├── 41_audit_ai_replay_despues.txt
+│   │   ├── 42_audit_ai_strict_despues.txt
+│   │   ├── 43_rechazo_01_test.txt
+│   │   ├── 44_rechazo_01_gate.txt
+│   │   ├── 45_rechazo_01_revertido_gate.txt
+│   │   ├── 46_test_final_equipo.txt
+│   │   ├── 47_test_final_ai.txt
+│   │   ├── 48_gate_final_equipo.txt
+│   │   ├── 49_gate_final_ai.txt
+│   │   ├── 50_gate_final_equipo_json.txt
+│   │   ├── 51_gate_final_ai_json.txt
+│   │   ├── 52_seed_restore_final.txt
+│   │   └── rechazo_01.diff
+│   ├── analisis_s13.md
+│   └── uso_de_ia.md
+├── entregable
+│   ├── DAE_S13_Extra_Entregable.docx
+│   └── DAE_S13_Extra_Entregable.pdf
+├── shop
+│   ├── management
+│   │   ├── commands
+│   │   │   ├── __init__.py
+│   │   │   ├── audit_cart.py
+│   │   │   ├── duelo.py
+│   │   │   ├── gate.py
+│   │   │   └── seed_shop.py
+│   │   └── __init__.py
+│   ├── migrations
+│   │   ├── 0001_initial.py
+│   │   └── __init__.py
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_api.py
+│   │   ├── test_audit.py
+│   │   ├── test_coupons.py
+│   │   ├── test_lines.py
+│   │   ├── test_stock.py
+│   │   └── test_totals.py
+│   ├── __init__.py
+│   ├── apps.py
+│   ├── audit.py
+│   ├── cart_ai.py
+│   ├── cart_team.py
+│   ├── catalog.py
+│   ├── domain.py
+│   ├── gate.py
+│   ├── impl.py
+│   ├── models.py
+│   ├── seed_data.py
+│   ├── urls.py
+│   └── views.py
+├── tools
+│   ├── api_smoke.ps1
+│   ├── build_report.py
+│   ├── decimal_check.py
+│   └── run_logged.ps1
+├── .gitignore
+├── AGENTS.md
+├── README.md
+├── manage.py
+└── requirements.txt
